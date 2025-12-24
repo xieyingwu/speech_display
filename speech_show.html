@@ -47,16 +47,14 @@
         }
 
         /* ========== 图片轮播核心样式 ========== */
-        /* 外层容器：统一控制图片展示区域 */
         .image-wrapper {
             width: 100%;
-            max-width: 800px; /* 限制最大宽度，适配竖屏图 */
+            max-width: 800px;
             margin: 0 auto;
             position: relative;
             padding: 10px 0;
         }
 
-        /* 轮播容器：所有屏幕都用轮播，居中展示 */
         .carousel-container {
             width: 100%;
             overflow: hidden;
@@ -64,29 +62,27 @@
             border-radius: 8px;
             margin: 0 auto;
             background-color: #f8f8f8;
+            min-height: 300px; /* 新增：保底高度，避免加载前空白 */
         }
 
-        /* 轮播轨道：用于切换图片 */
         .carousel-track {
             display: flex;
             transition: transform 0.4s ease-out;
             width: 100%;
         }
 
-        /* ========== 图片容器：增加内边距，适配竖屏图 ========== */
+        /* 图片容器：15px内边距，保底比例 */
         .carousel-img-wrapper {
             flex: 0 0 100%;
             width: 100%;
-            /* 核心：增加15px内边距（10-20px之间），避免图片贴边 */
             padding: 15px;
-            /* 初始默认比例，会通过JS动态调整为最大高宽比 */
-            aspect-ratio: 3/4; /* 先默认竖屏比例，后续动态更新 */
+            aspect-ratio: 4/3; /* 保底比例，加载后动态调整 */
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
             overflow: hidden;
-            cursor: pointer; /* 提示可点击预览 */
+            cursor: pointer;
         }
 
         /* 加载中动画 */
@@ -113,12 +109,9 @@
             line-height: 1.8;
         }
 
-        /* 图片样式：强制保留比例，适配竖屏容器 */
+        /* 图片样式：强制可见，修复加载逻辑 */
         .carousel-img-wrapper img {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            position: relative; /* 改为相对定位，避免加载前不可见 */
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
@@ -132,79 +125,74 @@
             opacity: 1;
         }
 
-        /* ========== 放大版切换按钮 ========== */
+        /* 轮播切换按钮 */
         .carousel-btn {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 60px; /* 放大按钮尺寸 */
+            width: 60px;
             height: 60px;
             background-color: rgba(0, 0, 0, 0.6);
             color: white;
             border: none;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 24px; /* 放大箭头字体 */
+            font-size: 24px;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 10;
             transition: all 0.3s ease;
-            /* 按钮阴影，增强视觉 */
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        /* 鼠标悬浮时按钮更明显 */
         .carousel-btn:hover {
             background-color: #007bff;
             transform: translateY(-50%) scale(1.1);
         }
 
         .prev-btn {
-            left: 20px; /* 远离边缘，更易点击 */
+            left: 20px;
         }
 
         .next-btn {
             right: 20px;
         }
 
-        /* ========== 强化版底部指示器 ========== */
+        /* 底部指示器 */
         .carousel-indicators {
             position: absolute;
-            bottom: 20px; /* 增加底部间距，更显眼 */
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 12px; /* 增大圆点间距 */
+            gap: 12px;
             z-index: 10;
         }
 
         .indicator {
-            width: 14px; /* 放大圆点尺寸 */
+            width: 14px;
             height: 14px;
             border-radius: 50%;
             background-color: rgba(255, 255, 255, 0.5);
             cursor: pointer;
             transition: all 0.3s ease;
-            /* 边框增强视觉 */
             border: 2px solid transparent;
         }
 
-        /* 选中的圆点高亮 */
         .indicator.active {
             background-color: white;
             border-color: #007bff;
-            transform: scale(1.2); /* 选中态放大 */
+            transform: scale(1.2);
             box-shadow: 0 0 8px rgba(0, 123, 255, 0.6);
         }
 
-        /* 只有1张图时隐藏按钮和指示器 */
         .single-img .carousel-btn,
         .single-img .carousel-indicators {
             display: none;
         }
 
-        /* ========== 图片预览弹窗样式 ========== */
+        /* 预览弹窗样式 */
         .preview-modal {
             position: fixed;
             top: 0;
@@ -213,18 +201,16 @@
             height: 100vh;
             background-color: rgba(0, 0, 0, 0.85);
             z-index: 9999;
-            display: none; /* 默认隐藏 */
+            display: none;
             justify-content: center;
             align-items: center;
             padding: 20px;
         }
 
-        /* 预览弹窗显示状态 */
         .preview-modal.show {
             display: flex;
         }
 
-        /* 预览图片容器 */
         .preview-img-container {
             position: relative;
             max-width: 90vw;
@@ -233,17 +219,15 @@
             border-radius: 8px;
         }
 
-        /* 预览图片样式：支持缩放 */
         .preview-img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
-            transition: transform 0.3s ease-out; /* 缩放动画 */
-            transform: scale(1); /* 初始1倍 */
-            cursor: zoom-in; /* 提示可放大 */
+            transition: transform 0.3s ease-out;
+            transform: scale(1);
+            cursor: zoom-in;
         }
 
-        /* 缩放后的光标提示 */
         .preview-img.scaled-15 {
             transform: scale(1.5);
             cursor: zoom-in;
@@ -251,10 +235,9 @@
 
         .preview-img.scaled-20 {
             transform: scale(2);
-            cursor: zoom-out; /* 2倍时提示可缩小 */
+            cursor: zoom-out;
         }
 
-        /* 预览弹窗关闭按钮 */
         .close-btn {
             position: absolute;
             top: -30px;
@@ -280,7 +263,7 @@
             transform: scale(1.1);
         }
 
-        /* ========== 新增：预览弹窗切换按钮 ========== */
+        /* 预览切换按钮 */
         .preview-nav-btn {
             position: absolute;
             top: 50%;
@@ -299,11 +282,9 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
             z-index: 10;
-            /* 只有多张图时显示 */
             display: none;
         }
 
-        /* 多张图时显示切换按钮 */
         .has-multiple .preview-nav-btn {
             display: flex;
         }
@@ -321,7 +302,7 @@
             right: -40px;
         }
 
-        /* 预览图片计数提示（可选，提升体验） */
+        /* 预览计数 */
         .preview-count {
             position: absolute;
             bottom: -30px;
@@ -337,45 +318,56 @@
 </head>
 <body>
     <div class="container">
-        <!-- 原文文本 -->
-        <div class="original-text" id="originalText"></div>
-
-        <!-- 翻译文本 -->
-        <div class="translated-text" id="translatedText"></div>
-
-        <!-- 图片外层容器 -->
+        <div class="original-text" id="originalText">测试原文：Hello World</div>
+        <div class="translated-text" id="translatedText">测试翻译：你好，世界</div>
+        
         <div class="image-wrapper">
-            <!-- 轮播容器 -->
             <div class="carousel-container" id="carouselContainer">
                 <div class="carousel-track" id="carouselTrack"></div>
-                <!-- 放大版切换按钮 -->
                 <button class="carousel-btn prev-btn" id="prevBtn">←</button>
                 <button class="carousel-btn next-btn" id="nextBtn">→</button>
-                <!-- 强化版指示器 -->
                 <div class="carousel-indicators" id="carouselIndicators"></div>
             </div>
         </div>
     </div>
 
-    <!-- 图片预览弹窗（默认隐藏） -->
+    <!-- 预览弹窗 -->
     <div class="preview-modal" id="previewModal">
         <div class="preview-img-container" id="previewImgContainer">
-            <!-- 预览切换按钮 -->
             <button class="preview-nav-btn preview-prev-btn" id="previewPrevBtn">←</button>
             <button class="preview-nav-btn preview-next-btn" id="previewNextBtn">→</button>
-            
             <img src="" alt="预览图片" class="preview-img" id="previewImg">
-            
-            <!-- 关闭按钮 -->
             <button class="close-btn" id="closePreviewBtn">×</button>
-            
-            <!-- 图片计数提示 -->
             <div class="preview-count" id="previewCount">1/3</div>
         </div>
     </div>
 
     <script>
-        // 1. 解析URL参数
+        // 核心变量
+        let currentSlide = 0;
+        let imageList = [];
+        let imageAspectRatios = [];
+        let currentScale = 1;
+        let currentPreviewIndex = 0;
+
+        // 初始化图片列表（替换为更稳定的图片地址）
+        function initImageList() {
+            // 使用稳定的测试图片地址，避免加载失败
+            imageList = [
+                'https://img-blog.csdnimg.cn/20240101150000.jpg', // 测试图1
+                'https://img-blog.csdnimg.cn/20240101150100.jpg', // 测试图2
+                'https://img-blog.csdnimg.cn/20240101150200.jpg'  // 测试图3
+                // 你可以替换为自己的图片地址，格式：['地址1','地址2']
+            ];
+
+            // 兼容URL参数传入的图片列表
+            const params = getUrlParams();
+            if (params.images && params.images.trim()) {
+                imageList = params.images.split(',').filter(url => url.trim());
+            }
+        }
+
+        // 解析URL参数
         function getUrlParams() {
             const params = {};
             const search = window.location.search.substring(1);
@@ -389,14 +381,7 @@
             return params;
         }
 
-        // 2. 核心变量
-        let currentSlide = 0; // 当前轮播索引
-        let imageList = []; // 图片URL列表
-        let imageAspectRatios = []; // 存储每张图片的高宽比（height/width）
-        let currentScale = 1; // 预览图片当前缩放比例（1/1.5/2）
-        let currentPreviewIndex = 0; // 当前预览的图片索引（新增）
-
-        // 3. 创建带占位的图片元素
+        // 创建图片元素（修复加载逻辑）
         function createImageWithPlaceholder(url, alt, index) {
             const wrapper = document.createElement('div');
             wrapper.className = 'carousel-img-wrapper';
@@ -406,44 +391,40 @@
             spinner.className = 'loading-spinner';
             wrapper.appendChild(spinner);
 
-            // 图片元素
-            const img = new Image(); // 用Image对象预加载，获取宽高比
+            // 图片元素（简化加载逻辑）
+            const img = document.createElement('img');
             img.src = url;
             img.alt = alt;
             img.style.opacity = '0';
 
-            // 预加载图片，获取真实宽高比
+            // 修复图片加载逻辑
             img.onload = function() {
-                // 计算高宽比（height/width），竖屏图该值>1
-                const aspectRatio = img.naturalHeight / img.naturalWidth;
-                imageAspectRatios.push(aspectRatio);
-                // 移除加载动画，显示图片
+                // 移除加载动画
                 spinner.remove();
                 img.classList.add('loaded');
-                // 所有图片加载完成后，统一调整容器比例
-                if (imageAspectRatios.length === imageList.length) {
-                    adjustContainerToMaxAspectRatio();
-                }
+                
+                // 记录高宽比
+                const aspectRatio = img.naturalHeight / img.naturalWidth;
+                imageAspectRatios[index] = aspectRatio;
+                
+                // 调整容器比例（立即生效）
+                adjustContainerToMaxAspectRatio();
             };
 
-            // 加载失败
+            // 加载失败处理
             img.onerror = function() {
                 spinner.remove();
                 const errorTip = document.createElement('div');
                 errorTip.className = 'load-error';
-                errorTip.textContent = '图片加载失败\n请检查图片地址是否正确';
+                errorTip.textContent = `图片加载失败：${url}\n请检查图片地址是否正确`;
                 wrapper.appendChild(errorTip);
-                // 加载失败时移除点击预览事件
                 wrapper.style.cursor = 'default';
             };
 
             wrapper.appendChild(img);
 
-            // 绑定点击预览事件（仅图片加载成功时生效）
-            img.addEventListener('click', () => {
-                openPreview(index); // 传入索引，而非URL
-            });
-            // 容器点击也触发预览（避免点到空白处）
+            // 点击预览事件
+            img.addEventListener('click', () => openPreview(index));
             wrapper.addEventListener('click', (e) => {
                 if (e.target === wrapper && img.classList.contains('loaded')) {
                     openPreview(index);
@@ -453,282 +434,186 @@
             return wrapper;
         }
 
-        // 4. 核心：调整容器比例为最大高宽比（适配竖屏图）
+        // 调整容器比例
         function adjustContainerToMaxAspectRatio() {
-            if (imageAspectRatios.length === 0) return;
-            // 找到所有图片中最大的高宽比（竖屏图的比值更大）
-            const maxAspectRatio = Math.max(...imageAspectRatios);
-            // 获取所有图片容器，设置统一的比例
+            // 过滤有效比例值
+            const validRatios = imageAspectRatios.filter(ratio => !isNaN(ratio) && ratio > 0);
+            if (validRatios.length === 0) return;
+            
+            const maxAspectRatio = Math.max(...validRatios);
             const allWrappers = document.querySelectorAll('.carousel-img-wrapper');
             allWrappers.forEach(wrapper => {
                 wrapper.style.aspectRatio = maxAspectRatio;
             });
         }
 
-        // 5. 初始化轮播
+        // 初始化轮播
         function initCarousel() {
             const carouselTrack = document.getElementById('carouselTrack');
             const indicators = document.getElementById('carouselIndicators');
             const carouselContainer = document.getElementById('carouselContainer');
             
-            // 清空原有内容
             carouselTrack.innerHTML = '';
             indicators.innerHTML = '';
-            imageAspectRatios = []; // 重置高宽比数组
+            imageAspectRatios = new Array(imageList.length).fill(4/3); // 初始化默认比例
 
-            // 生成轮播图片和指示器
+            // 生成图片和指示器
             imageList.forEach((url, index) => {
-                // 生成图片（传入索引）
-                const imgWrapper = createImageWithPlaceholder(url, `展示图片${index + 1}`, index);
+                const imgWrapper = createImageWithPlaceholder(url, `图片${index + 1}`, index);
                 carouselTrack.appendChild(imgWrapper);
 
-                // 生成指示器
                 const indicator = document.createElement('div');
                 indicator.className = `indicator ${index === 0 ? 'active' : ''}`;
                 indicator.dataset.index = index;
-                // 点击圆点切换图片
-                indicator.addEventListener('click', () => {
-                    goToSlide(index);
-                });
+                indicator.addEventListener('click', () => goToSlide(index));
                 indicators.appendChild(indicator);
             });
 
-            // 只有1张图时添加类，隐藏按钮和指示器
+            // 单张图隐藏按钮
             if (imageList.length <= 1) {
                 carouselContainer.classList.add('single-img');
             } else {
                 carouselContainer.classList.remove('single-img');
             }
 
-            // 初始显示第一张
             goToSlide(0);
         }
 
-        // 6. 切换到指定轮播图
+        // 切换轮播图
         function goToSlide(index) {
-            // 边界处理：循环切换
-            currentSlide = index < 0 
-                ? imageList.length - 1 
-                : index >= imageList.length 
-                    ? 0 
-                    : index;
-
-            // 移动轮播轨道
-            const carouselTrack = document.getElementById('carouselTrack');
-            carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
-
-            // 更新指示器状态
-            const allIndicators = document.querySelectorAll('.indicator');
-            allIndicators.forEach((ind, i) => {
+            currentSlide = index < 0 ? imageList.length - 1 : index >= imageList.length ? 0 : index;
+            document.getElementById('carouselTrack').style.transform = `translateX(-${currentSlide * 100}%)`;
+            
+            // 更新指示器
+            document.querySelectorAll('.indicator').forEach((ind, i) => {
                 ind.classList.toggle('active', i === currentSlide);
             });
         }
 
-        // 7. 打开图片预览弹窗（修改：按索引预览）
+        // 打开预览
         function openPreview(index) {
-            const previewModal = document.getElementById('previewModal');
-            const previewImg = document.getElementById('previewImg');
-            const previewCount = document.getElementById('previewCount');
-            const previewImgContainer = document.getElementById('previewImgContainer');
+            const modal = document.getElementById('previewModal');
+            const img = document.getElementById('previewImg');
+            const count = document.getElementById('previewCount');
+            const container = document.getElementById('previewImgContainer');
             
-            // 设置当前预览索引
             currentPreviewIndex = index;
-            // 重置缩放比例
             currentScale = 1;
-            previewImg.className = 'preview-img'; // 重置缩放类
             
-            // 设置预览图片和计数
-            previewImg.src = imageList[currentPreviewIndex];
-            previewImg.alt = `预览图片${currentPreviewIndex + 1}`;
-            previewCount.textContent = `${currentPreviewIndex + 1}/${imageList.length}`;
+            img.src = imageList[currentPreviewIndex];
+            img.alt = `预览图片${currentPreviewIndex + 1}`;
+            img.className = 'preview-img';
+            count.textContent = `${currentPreviewIndex + 1}/${imageList.length}`;
             
-            // 多张图时显示切换按钮
-            if (imageList.length > 1) {
-                previewImgContainer.classList.add('has-multiple');
-            } else {
-                previewImgContainer.classList.remove('has-multiple');
-            }
-            
-            // 显示预览弹窗
-            previewModal.classList.add('show');
-            // 禁止页面滚动
+            container.classList.toggle('has-multiple', imageList.length > 1);
+            modal.classList.add('show');
             document.body.style.overflow = 'hidden';
         }
 
-        // 8. 关闭图片预览弹窗
+        // 关闭预览
         function closePreview() {
-            const previewModal = document.getElementById('previewModal');
-            previewModal.classList.remove('show');
-            // 恢复页面滚动
+            document.getElementById('previewModal').classList.remove('show');
             document.body.style.overflow = 'auto';
         }
 
-        // 9. 预览图片缩放逻辑
+        // 预览缩放
         function togglePreviewScale() {
-            const previewImg = document.getElementById('previewImg');
-            
-            // 循环切换缩放比例：1 → 1.5 → 2 → 1
+            const img = document.getElementById('previewImg');
             switch(currentScale) {
                 case 1:
                     currentScale = 1.5;
-                    previewImg.className = 'preview-img scaled-15';
+                    img.className = 'preview-img scaled-15';
                     break;
                 case 1.5:
                     currentScale = 2;
-                    previewImg.className = 'preview-img scaled-20';
+                    img.className = 'preview-img scaled-20';
                     break;
                 case 2:
                     currentScale = 1;
-                    previewImg.className = 'preview-img';
+                    img.className = 'preview-img';
                     break;
             }
         }
 
-        // 10. 新增：预览弹窗切换上一张图片
+        // 预览切换图片
         function previewPrevImg() {
-            // 循环切换：第一张的上一张是最后一张
-            currentPreviewIndex = currentPreviewIndex - 1 < 0 
-                ? imageList.length - 1 
-                : currentPreviewIndex - 1;
-            // 更新预览内容（重置缩放）
+            currentPreviewIndex = currentPreviewIndex - 1 < 0 ? imageList.length - 1 : currentPreviewIndex - 1;
             updatePreviewContent();
         }
 
-        // 11. 新增：预览弹窗切换下一张图片
         function previewNextImg() {
-            // 循环切换：最后一张的下一张是第一张
-            currentPreviewIndex = currentPreviewIndex + 1 >= imageList.length 
-                ? 0 
-                : currentPreviewIndex + 1;
-            // 更新预览内容（重置缩放）
+            currentPreviewIndex = currentPreviewIndex + 1 >= imageList.length ? 0 : currentPreviewIndex + 1;
             updatePreviewContent();
         }
 
-        // 12. 新增：更新预览弹窗内容（切换图片时调用）
+        // 更新预览内容
         function updatePreviewContent() {
-            const previewImg = document.getElementById('previewImg');
-            const previewCount = document.getElementById('previewCount');
+            const img = document.getElementById('previewImg');
+            const count = document.getElementById('previewCount');
             
-            // 重置缩放比例
             currentScale = 1;
-            previewImg.className = 'preview-img';
-            
-            // 更新图片和计数
-            previewImg.src = imageList[currentPreviewIndex];
-            previewImg.alt = `预览图片${currentPreviewIndex + 1}`;
-            previewCount.textContent = `${currentPreviewIndex + 1}/${imageList.length}`;
+            img.src = imageList[currentPreviewIndex];
+            img.alt = `预览图片${currentPreviewIndex + 1}`;
+            img.className = 'preview-img';
+            count.textContent = `${currentPreviewIndex + 1}/${imageList.length}`;
         }
 
-        // 13. 初始化页面内容
-        function initPage() {
-            const params = getUrlParams();
-            
-            // 填充文本内容
-            const originalText = params.original || '默认原文：The woods are lovely, dark and deep.';
-            const translatedText = params.translated || '默认翻译：树林可爱，深邃幽暗。';
-            document.getElementById('originalText').textContent = originalText;
-            document.getElementById('translatedText').textContent = translatedText;
-
-            // 获取图片列表（支持多图，逗号分隔）
-            imageList = params.images 
-                ? params.images.split(',').filter(url => url.trim()) 
-                : [
-                    'https://picsum.photos/300/400?random=1', // 竖屏图（3:4）
-                    'https://picsum.photos/400/300?random=2', // 横屏图（4:3）
-                    'https://picsum.photos/200/500?random=3'  // 更竖的图（2:5）
-                ];
-
-            // 初始化轮播
-            initCarousel();
-        }
-
-        // 14. 绑定所有事件
+        // 绑定所有事件
         function bindEvents() {
-            // 轮播按钮事件
-            document.getElementById('prevBtn').addEventListener('click', () => {
-                goToSlide(currentSlide - 1);
-            });
-            document.getElementById('nextBtn').addEventListener('click', () => {
-                goToSlide(currentSlide + 1);
-            });
+            // 轮播按钮
+            document.getElementById('prevBtn').addEventListener('click', () => goToSlide(currentSlide - 1));
+            document.getElementById('nextBtn').addEventListener('click', () => goToSlide(currentSlide + 1));
 
-            // 移动端滑动切换（轮播）
-            const carouselContainer = document.getElementById('carouselContainer');
+            // 轮播滑动
+            const carousel = document.getElementById('carouselContainer');
             let startX = 0;
-            carouselContainer.addEventListener('touchstart', (e) => {
-                startX = e.touches[0].clientX;
-            });
-            carouselContainer.addEventListener('touchend', (e) => {
-                const endX = e.changedTouches[0].clientX;
-                const diffX = startX - endX;
+            carousel.addEventListener('touchstart', (e) => startX = e.touches[0].clientX);
+            carousel.addEventListener('touchend', (e) => {
+                const diffX = startX - e.changedTouches[0].clientX;
                 if (diffX > 50) goToSlide(currentSlide + 1);
                 else if (diffX < -50) goToSlide(currentSlide - 1);
             });
 
-            // 预览弹窗事件
-            // 关闭按钮
+            // 预览事件
             document.getElementById('closePreviewBtn').addEventListener('click', closePreview);
-            // 预览图片缩放
             document.getElementById('previewImg').addEventListener('click', togglePreviewScale);
-            // 点击遮罩层关闭预览
             document.getElementById('previewModal').addEventListener('click', (e) => {
-                if (e.target === document.getElementById('previewModal')) {
-                    closePreview();
-                }
-            });
-            // 按ESC键关闭预览
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && document.getElementById('previewModal').classList.contains('show')) {
-                    closePreview();
-                }
+                if (e.target === document.getElementById('previewModal')) closePreview();
             });
 
-            // 新增：预览弹窗切换按钮事件
+            // 预览切换
             document.getElementById('previewPrevBtn').addEventListener('click', previewPrevImg);
             document.getElementById('previewNextBtn').addEventListener('click', previewNextImg);
 
-            // 新增：预览弹窗移动端滑动切换图片
-            const previewImgContainer = document.getElementById('previewImgContainer');
+            // 预览滑动
+            const previewContainer = document.getElementById('previewImgContainer');
             let previewStartX = 0;
-            previewImgContainer.addEventListener('touchstart', (e) => {
-                previewStartX = e.touches[0].clientX;
-            });
-            previewImgContainer.addEventListener('touchend', (e) => {
-                const endX = e.changedTouches[0].clientX;
-                const diffX = previewStartX - endX;
-                // 滑动距离大于50px才触发切换
-                if (diffX > 50) {
-                    previewNextImg(); // 左滑→下一张
-                } else if (diffX < -50) {
-                    previewPrevImg(); // 右滑→上一张
-                }
+            previewContainer.addEventListener('touchstart', (e) => previewStartX = e.touches[0].clientX);
+            previewContainer.addEventListener('touchend', (e) => {
+                const diffX = previewStartX - e.changedTouches[0].clientX;
+                if (diffX > 50) previewNextImg();
+                else if (diffX < -50) previewPrevImg();
             });
 
-            // 新增：键盘方向键切换预览图片
+            // 键盘事件
             document.addEventListener('keydown', (e) => {
                 if (document.getElementById('previewModal').classList.contains('show')) {
-                    switch(e.key) {
-                        case 'ArrowLeft':
-                            previewPrevImg();
-                            break;
-                        case 'ArrowRight':
-                            previewNextImg();
-                            break;
-                    }
+                    if (e.key === 'Escape') closePreview();
+                    else if (e.key === 'ArrowLeft') previewPrevImg();
+                    else if (e.key === 'ArrowRight') previewNextImg();
                 }
             });
         }
 
-        // 页面加载完成后初始化
+        // 页面加载初始化
         window.onload = () => {
-            initPage();
+            initImageList();
+            initCarousel();
             bindEvents();
         };
 
-        // 窗口大小变化时重新适配
-        window.addEventListener('resize', () => {
-            adjustContainerToMaxAspectRatio();
-        });
+        // 窗口大小调整
+        window.addEventListener('resize', adjustContainerToMaxAspectRatio);
     </script>
 </body>
 </html>

@@ -46,39 +46,50 @@
             padding-left: 10px;
         }
 
-        /* ========== 图片轮播核心样式 ========== */
-        /* 外层容器：统一控制图片展示区域 */
+        /* ========== 图片容器核心样式 ========== */
+        /* 外层容器：统一控制图片展示区域，强化居中 */
         .image-wrapper {
             width: 100%;
-            max-width: 800px; /* 限制最大宽度，适配竖屏图 */
+            max-width: 1000px;
             margin: 0 auto;
             position: relative;
             padding: 10px 0;
         }
 
-        /* 轮播容器：所有屏幕都用轮播，居中展示 */
-        .carousel-container {
-            width: 100%;
-            overflow: hidden;
-            position: relative;
-            border-radius: 8px;
-            margin: 0 auto;
-            background-color: #f8f8f8;
-        }
-
-        /* 轮播轨道：用于切换图片 */
-        .carousel-track {
+        /* 桌面端（空间充足）：flex水平排布 + 强制居中 + 不拉伸 */
+        .image-container {
             display: flex;
-            transition: transform 0.4s ease-out;
+            justify-content: center; /* 整体水平居中 */
+            align-items: flex-start; /* 顶部对齐，保留比例 */
+            gap: 20px;
+            flex-wrap: wrap; /* 宽度不足时换行，不拉伸 */
             width: 100%;
+            padding: 10px;
         }
 
-        /* ========== 图片容器：适配竖屏图的展示空间 ========== */
+        /* ========== 图片加载占位 + 比例保留 核心样式 ========== */
+        /* 桌面端图片容器：保留比例，不强制拉伸 */
+        .img-wrapper {
+            max-width: 250px; /* 图片最大宽度，不超限 */
+            width: calc(100% / 3 - 20px); /* 最多3列，适配宽度 */
+            min-width: 180px; /* 最小宽度，保证阅读体验 */
+            aspect-ratio: 4/3; /* 保留图片常用比例（可根据你的图片调整） */
+            border-radius: 4px;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 轮播模式图片容器：全屏宽但保留比例 */
         .carousel-img-wrapper {
             flex: 0 0 100%;
             width: 100%;
-            /* 初始默认比例，会通过JS动态调整为最大高宽比 */
-            aspect-ratio: 3/4; /* 先默认竖屏比例，后续动态更新 */
+            aspect-ratio: 4/3; /* 和桌面端统一比例 */
+            min-height: 200px;
+            background-color: #f0f0f0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -88,10 +99,10 @@
 
         /* 加载中动画 */
         .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #e0e0e0;
-            border-top: 5px solid #007bff;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e0e0;
+            border-top: 4px solid #007bff;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -104,128 +115,147 @@
         /* 加载失败提示 */
         .load-error {
             color: #ff4444;
-            font-size: 16px;
+            font-size: 14px;
             text-align: center;
-            padding: 20px;
-            line-height: 1.8;
+            padding: 10px;
         }
 
-        /* 图片样式：强制保留比例，适配竖屏容器 */
-        .carousel-img-wrapper img {
+        /* 核心：图片强制保留比例，不拉伸 */
+        .img-wrapper img, .carousel-img-wrapper img {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
+            max-width: 100%; /* 不超过容器宽度 */
+            max-height: 100%; /* 不超过容器高度 */
+            object-fit: contain; /* 保留比例，完整显示图片，不裁剪 */
             border-radius: 4px;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            opacity: 0; /* 初始透明 */
         }
 
-        .carousel-img-wrapper img.loaded {
-            opacity: 1;
+        .img-wrapper img.loaded, .carousel-img-wrapper img.loaded {
+            opacity: 1; /* 加载完成显示 */
         }
 
-        /* ========== 放大版切换按钮 ========== */
+        .img-wrapper img:hover {
+            transform: translate(-50%, -50%) scale(1.05); /* hover放大，保留居中 */
+        }
+
+        /* ========== 轮播样式 ========== */
+        .carousel-container {
+            display: none;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            border-radius: 4px;
+            margin: 0 auto; /* 轮播容器整体居中 */
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            width: 100%;
+        }
+
+        /* 轮播切换按钮 */
         .carousel-btn {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 60px; /* 放大按钮尺寸 */
-            height: 60px;
-            background-color: rgba(0, 0, 0, 0.6);
+            width: 40px;
+            height: 40px;
+            background-color: rgba(0, 0, 0, 0.5);
             color: white;
             border: none;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 24px; /* 放大箭头字体 */
+            font-size: 18px;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 10;
-            transition: all 0.3s ease;
-            /* 按钮阴影，增强视觉 */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
         }
 
-        /* 鼠标悬浮时按钮更明显 */
         .carousel-btn:hover {
-            background-color: #007bff;
-            transform: translateY(-50%) scale(1.1);
+            background-color: rgba(0, 0, 0, 0.7);
         }
 
         .prev-btn {
-            left: 20px; /* 远离边缘，更易点击 */
+            left: 10px;
         }
 
         .next-btn {
-            right: 20px;
+            right: 10px;
         }
 
-        /* ========== 强化版底部指示器 ========== */
+        /* 轮播指示器 */
         .carousel-indicators {
             position: absolute;
-            bottom: 20px; /* 增加底部间距，更显眼 */
+            bottom: 15px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 12px; /* 增大圆点间距 */
+            gap: 8px;
             z-index: 10;
         }
 
         .indicator {
-            width: 14px; /* 放大圆点尺寸 */
-            height: 14px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             background-color: rgba(255, 255, 255, 0.5);
             cursor: pointer;
-            transition: all 0.3s ease;
-            /* 边框增强视觉 */
-            border: 2px solid transparent;
+            transition: background-color 0.3s ease;
         }
 
-        /* 选中的圆点高亮 */
         .indicator.active {
             background-color: white;
-            border-color: #007bff;
-            transform: scale(1.2); /* 选中态放大 */
-            box-shadow: 0 0 8px rgba(0, 123, 255, 0.6);
         }
 
-        /* 只有1张图时隐藏按钮和指示器 */
-        .single-img .carousel-btn,
-        .single-img .carousel-indicators {
-            display: none;
+        /* ========== 媒体查询：适配不同屏幕 ========== */
+        /* 中等屏幕：最多2列 */
+        @media (max-width: 992px) and (min-width: 768px) {
+            .img-wrapper {
+                width: calc(100% / 2 - 20px); /* 2列排布 */
+            }
+        }
+
+        /* 小屏幕：轮播模式 */
+        @media (max-width: 768px) {
+            .image-container {
+                display: none;
+            }
+            .carousel-container {
+                display: block;
+            }
+            .img-wrapper {
+                width: 100%; /* 换行后单张图片占满宽度，但不超max-width */
+                max-width: 300px; /* 移动端单张图最大宽度，保证体验 */
+                margin: 0 auto; /* 移动端换行后图片居中 */
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 原文文本 -->
         <div class="original-text" id="originalText"></div>
-
-        <!-- 翻译文本 -->
         <div class="translated-text" id="translatedText"></div>
-
-        <!-- 图片外层容器 -->
         <div class="image-wrapper">
-            <!-- 轮播容器 -->
+            <div class="image-container" id="imageContainer"></div>
             <div class="carousel-container" id="carouselContainer">
                 <div class="carousel-track" id="carouselTrack"></div>
-                <!-- 放大版切换按钮 -->
                 <button class="carousel-btn prev-btn" id="prevBtn">←</button>
                 <button class="carousel-btn next-btn" id="nextBtn">→</button>
-                <!-- 强化版指示器 -->
                 <div class="carousel-indicators" id="carouselIndicators"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // 1. 解析URL参数
+        // 解析URL参数
         function getUrlParams() {
             const params = {};
             const search = window.location.search.substring(1);
@@ -239,15 +269,14 @@
             return params;
         }
 
-        // 2. 核心变量
-        let currentSlide = 0; // 当前轮播索引
-        let imageList = []; // 图片URL列表
-        let imageAspectRatios = []; // 存储每张图片的高宽比（height/width）
+        // 轮播核心变量
+        let currentSlide = 0;
+        let imageList = [];
 
-        // 3. 创建带占位的图片元素
-        function createImageWithPlaceholder(url, alt) {
+        // 创建带占位的图片元素（保留比例）
+        function createImageWithPlaceholder(url, alt, isCarousel = false) {
             const wrapper = document.createElement('div');
-            wrapper.className = 'carousel-img-wrapper';
+            wrapper.className = isCarousel ? 'carousel-img-wrapper' : 'img-wrapper';
 
             // 加载动画
             const spinner = document.createElement('div');
@@ -255,171 +284,113 @@
             wrapper.appendChild(spinner);
 
             // 图片元素
-            const img = new Image(); // 用Image对象预加载，获取宽高比
+            const img = document.createElement('img');
             img.src = url;
             img.alt = alt;
-            img.style.opacity = '0';
 
-            // 预加载图片，获取真实宽高比
-            img.onload = function() {
-                // 计算高宽比（height/width），竖屏图该值>1
-                const aspectRatio = img.naturalHeight / img.naturalWidth;
-                imageAspectRatios.push(aspectRatio);
-                // 移除加载动画，显示图片
+            // 加载完成
+            img.addEventListener('load', () => {
                 spinner.remove();
                 img.classList.add('loaded');
-                // 所有图片加载完成后，统一调整容器比例
-                if (imageAspectRatios.length === imageList.length) {
-                    adjustContainerToMaxAspectRatio();
-                }
-            };
+            });
 
             // 加载失败
-            img.onerror = function() {
+            img.addEventListener('error', () => {
                 spinner.remove();
                 const errorTip = document.createElement('div');
                 errorTip.className = 'load-error';
-                errorTip.textContent = '图片加载失败\n请检查图片地址是否正确';
+                errorTip.textContent = '图片加载失败';
                 wrapper.appendChild(errorTip);
-            };
+            });
 
             wrapper.appendChild(img);
             return wrapper;
         }
 
-        // 4. 核心：调整容器比例为最大高宽比（适配竖屏图）
-        function adjustContainerToMaxAspectRatio() {
-            if (imageAspectRatios.length === 0) return;
-            // 找到最大的高宽比（竖屏图的比值更大）
-            const maxAspectRatio = Math.max(...imageAspectRatios);
-            // 获取所有图片容器，设置统一的比例
-            const allWrappers = document.querySelectorAll('.carousel-img-wrapper');
-            allWrappers.forEach(wrapper => {
-                wrapper.style.aspectRatio = maxAspectRatio;
-            });
-        }
-
-        // 5. 初始化轮播
+        // 初始化轮播
         function initCarousel() {
             const carouselTrack = document.getElementById('carouselTrack');
             const indicators = document.getElementById('carouselIndicators');
-            const carouselContainer = document.getElementById('carouselContainer');
-            
-            // 清空原有内容
             carouselTrack.innerHTML = '';
             indicators.innerHTML = '';
-            imageAspectRatios = []; // 重置高宽比数组
 
-            // 生成轮播图片和指示器
             imageList.forEach((url, index) => {
-                // 生成图片
-                const imgWrapper = createImageWithPlaceholder(url, `展示图片${index + 1}`);
+                const imgWrapper = createImageWithPlaceholder(url, `轮播图片${index + 1}`, true);
                 carouselTrack.appendChild(imgWrapper);
 
-                // 生成指示器
                 const indicator = document.createElement('div');
                 indicator.className = `indicator ${index === 0 ? 'active' : ''}`;
                 indicator.dataset.index = index;
-                // 点击圆点切换图片
-                indicator.addEventListener('click', () => {
-                    goToSlide(index);
-                });
+                indicator.addEventListener('click', () => goToSlide(index));
                 indicators.appendChild(indicator);
             });
 
-            // 只有1张图时添加类，隐藏按钮和指示器
             if (imageList.length <= 1) {
-                carouselContainer.classList.add('single-img');
-            } else {
-                carouselContainer.classList.remove('single-img');
+                document.getElementById('prevBtn').style.display = 'none';
+                document.getElementById('nextBtn').style.display = 'none';
+                indicators.style.display = 'none';
             }
-
-            // 初始显示第一张
-            goToSlide(0);
         }
 
-        // 6. 切换到指定轮播图
+        // 切换轮播图
         function goToSlide(index) {
-            // 边界处理：循环切换
-            currentSlide = index < 0 
-                ? imageList.length - 1 
-                : index >= imageList.length 
-                    ? 0 
-                    : index;
-
-            // 移动轮播轨道
-            const carouselTrack = document.getElementById('carouselTrack');
-            carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
-
-            // 更新指示器状态
-            const allIndicators = document.querySelectorAll('.indicator');
-            allIndicators.forEach((ind, i) => {
+            currentSlide = index < 0 ? imageList.length - 1 : index >= imageList.length ? 0 : index;
+            document.getElementById('carouselTrack').style.transform = `translateX(-${currentSlide * 100}%)`;
+            document.querySelectorAll('.indicator').forEach((ind, i) => {
                 ind.classList.toggle('active', i === currentSlide);
             });
         }
 
-        // 7. 初始化页面内容
+        // 初始化页面
         function initPage() {
             const params = getUrlParams();
-            
-            // 填充文本内容
             const originalText = params.original || '默认原文：The woods are lovely, dark and deep.';
             const translatedText = params.translated || '默认翻译：树林可爱，深邃幽暗。';
             document.getElementById('originalText').textContent = originalText;
             document.getElementById('translatedText').textContent = translatedText;
 
-            // 获取图片列表（支持多图，逗号分隔）
+            // 获取图片列表
             imageList = params.images 
-                ? params.images.split(',').filter(url => url.trim()) 
-                : [
-                    'https://picsum.photos/300/400?random=1', // 竖屏图（3:4）
-                    'https://picsum.photos/400/300?random=2', // 横屏图（4:3）
-                    'https://picsum.photos/200/500?random=3'  // 更竖的图（2:5）
-                ];
+                ? params.images.split(',').filter(url => url.trim())
+                : ['https://picsum.photos/400/300?random=1']; // 4:3比例测试图
 
-            // 初始化轮播
+            // 生成桌面端图片
+            const imageContainer = document.getElementById('imageContainer');
+            imageContainer.innerHTML = '';
+            imageList.forEach((url, index) => {
+                const imgWrapper = createImageWithPlaceholder(url, `展示图片${index + 1}`);
+                imageContainer.appendChild(imgWrapper);
+            });
+
             initCarousel();
         }
 
-        // 8. 绑定轮播事件
+        // 绑定轮播事件
         function bindCarouselEvents() {
-            // 上一张按钮
-            document.getElementById('prevBtn').addEventListener('click', () => {
-                goToSlide(currentSlide - 1);
-            });
+            document.getElementById('prevBtn').addEventListener('click', () => goToSlide(currentSlide - 1));
+            document.getElementById('nextBtn').addEventListener('click', () => goToSlide(currentSlide + 1));
 
-            // 下一张按钮
-            document.getElementById('nextBtn').addEventListener('click', () => {
-                goToSlide(currentSlide + 1);
-            });
-
-            // 移动端滑动切换（保留，提升体验）
+            // 移动端滑动
             const carouselContainer = document.getElementById('carouselContainer');
             let startX = 0;
-            carouselContainer.addEventListener('touchstart', (e) => {
-                startX = e.touches[0].clientX;
-            });
+            carouselContainer.addEventListener('touchstart', (e) => startX = e.touches[0].clientX);
             carouselContainer.addEventListener('touchend', (e) => {
                 const endX = e.changedTouches[0].clientX;
                 const diffX = startX - endX;
-                // 滑动距离大于50px才触发切换
-                if (diffX > 50) {
-                    goToSlide(currentSlide + 1); // 左滑→下一张
-                } else if (diffX < -50) {
-                    goToSlide(currentSlide - 1); // 右滑→上一张
-                }
+                if (diffX > 50) goToSlide(currentSlide + 1);
+                else if (diffX < -50) goToSlide(currentSlide - 1);
             });
         }
 
-        // 页面加载完成后初始化
+        // 页面加载初始化
         window.onload = () => {
             initPage();
             bindCarouselEvents();
         };
 
-        // 窗口大小变化时重新适配
         window.addEventListener('resize', () => {
-            adjustContainerToMaxAspectRatio();
+            initCarousel();
+            goToSlide(currentSlide);
         });
     </script>
 </body>

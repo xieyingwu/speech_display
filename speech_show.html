@@ -47,61 +47,116 @@
         }
 
         /* ========== 图片容器核心样式 ========== */
-        /* 外层容器：统一控制图片展示区域 */
+        /* 外层容器：统一控制图片展示区域，强化居中 */
         .image-wrapper {
             width: 100%;
             max-width: 1000px;
             margin: 0 auto;
             position: relative;
+            padding: 10px 0;
         }
 
-        /* 桌面端（空间充足）：flex水平排布 */
+        /* 桌面端（空间充足）：flex水平排布 + 强制居中 + 不拉伸 */
         .image-container {
+            display: flex;
+            justify-content: center; /* 整体水平居中 */
+            align-items: flex-start; /* 顶部对齐，保留比例 */
+            gap: 20px;
+            flex-wrap: wrap; /* 宽度不足时换行，不拉伸 */
+            width: 100%;
+            padding: 10px;
+        }
+
+        /* ========== 图片加载占位 + 比例保留 核心样式 ========== */
+        /* 桌面端图片容器：保留比例，不强制拉伸 */
+        .img-wrapper {
+            max-width: 250px; /* 图片最大宽度，不超限 */
+            width: calc(100% / 3 - 20px); /* 最多3列，适配宽度 */
+            min-width: 180px; /* 最小宽度，保证阅读体验 */
+            aspect-ratio: 4/3; /* 保留图片常用比例（可根据你的图片调整） */
+            border-radius: 4px;
+            background-color: #f0f0f0;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            width: 100%;
+            position: relative;
+            overflow: hidden;
         }
 
-        /* 图片基础样式 */
-        .image-container img {
-            max-width: 250px;
-            height: auto;
+        /* 轮播模式图片容器：全屏宽但保留比例 */
+        .carousel-img-wrapper {
+            flex: 0 0 100%;
+            width: 100%;
+            aspect-ratio: 4/3; /* 和桌面端统一比例 */
+            min-height: 200px;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 加载中动画 */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e0e0;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 加载失败提示 */
+        .load-error {
+            color: #ff4444;
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+        }
+
+        /* 核心：图片强制保留比例，不拉伸 */
+        .img-wrapper img, .carousel-img-wrapper img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 100%; /* 不超过容器宽度 */
+            max-height: 100%; /* 不超过容器高度 */
+            object-fit: contain; /* 保留比例，完整显示图片，不裁剪 */
             border-radius: 4px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
-            cursor: pointer;
+            opacity: 0; /* 初始透明 */
         }
 
-        .image-container img:hover {
-            transform: scale(1.05);
+        .img-wrapper img.loaded, .carousel-img-wrapper img.loaded {
+            opacity: 1; /* 加载完成显示 */
         }
 
-        /* ========== 轮播样式（移动端/空间不足时） ========== */
-        /* 轮播容器：隐藏溢出，相对定位 */
+        .img-wrapper img:hover {
+            transform: translate(-50%, -50%) scale(1.05); /* hover放大，保留居中 */
+        }
+
+        /* ========== 轮播样式 ========== */
         .carousel-container {
-            display: none; /* 默认隐藏，媒体查询触发显示 */
+            display: none;
             width: 100%;
             overflow: hidden;
             position: relative;
             border-radius: 4px;
+            margin: 0 auto; /* 轮播容器整体居中 */
         }
 
-        /* 轮播图片列表：横向排列，绝对定位 */
         .carousel-track {
             display: flex;
-            transition: transform 0.5s ease-in-out; /* 平滑切换动画 */
+            transition: transform 0.5s ease-in-out;
             width: 100%;
-        }
-
-        /* 轮播单张图片：占满容器宽度 */
-        .carousel-track img {
-            flex: 0 0 100%;
-            max-width: 100%;
-            height: auto;
-            object-fit: cover;
         }
 
         /* 轮播切换按钮 */
@@ -136,7 +191,7 @@
             right: 10px;
         }
 
-        /* 轮播指示器（小圆点） */
+        /* 轮播指示器 */
         .carousel-indicators {
             position: absolute;
             bottom: 15px;
@@ -157,53 +212,54 @@
         }
 
         .indicator.active {
-            background-color: white; /* 选中的圆点高亮 */
+            background-color: white;
         }
 
-        /* ========== 媒体查询：屏幕宽度小于768px时切换为轮播 ========== */
+        /* ========== 媒体查询：适配不同屏幕 ========== */
+        /* 中等屏幕：最多2列 */
+        @media (max-width: 992px) and (min-width: 768px) {
+            .img-wrapper {
+                width: calc(100% / 2 - 20px); /* 2列排布 */
+            }
+        }
+
+        /* 小屏幕：轮播模式 */
         @media (max-width: 768px) {
             .image-container {
-                display: none; /* 隐藏flex排布 */
+                display: none;
             }
             .carousel-container {
-                display: block; /* 显示轮播 */
+                display: block;
+            }
+            .img-wrapper {
+                width: 100%; /* 换行后单张图片占满宽度，但不超max-width */
+                max-width: 300px; /* 移动端单张图最大宽度，保证体验 */
+                margin: 0 auto; /* 移动端换行后图片居中 */
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 原文文本（动态填充） -->
         <div class="original-text" id="originalText"></div>
-
-        <!-- 翻译文本（动态填充） -->
         <div class="translated-text" id="translatedText"></div>
-
-        <!-- 图片外层容器 -->
         <div class="image-wrapper">
-            <!-- 桌面端flex排布容器 -->
             <div class="image-container" id="imageContainer"></div>
-
-            <!-- 移动端轮播容器 -->
             <div class="carousel-container" id="carouselContainer">
-                <!-- 轮播图片列表 -->
                 <div class="carousel-track" id="carouselTrack"></div>
-                <!-- 切换按钮 -->
                 <button class="carousel-btn prev-btn" id="prevBtn">←</button>
                 <button class="carousel-btn next-btn" id="nextBtn">→</button>
-                <!-- 指示器小圆点 -->
                 <div class="carousel-indicators" id="carouselIndicators"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // 1. 解析URL参数的工具函数
+        // 解析URL参数
         function getUrlParams() {
             const params = {};
             const search = window.location.search.substring(1);
             if (!search) return params;
-            
             search.split('&').forEach(pair => {
                 const [key, value] = pair.split('=');
                 if (key && value) {
@@ -213,39 +269,62 @@
             return params;
         }
 
-        // 2. 轮播核心变量
-        let currentSlide = 0; // 当前轮播索引
-        let imageList = []; // 图片URL列表
+        // 轮播核心变量
+        let currentSlide = 0;
+        let imageList = [];
 
-        // 3. 初始化轮播
+        // 创建带占位的图片元素（保留比例）
+        function createImageWithPlaceholder(url, alt, isCarousel = false) {
+            const wrapper = document.createElement('div');
+            wrapper.className = isCarousel ? 'carousel-img-wrapper' : 'img-wrapper';
+
+            // 加载动画
+            const spinner = document.createElement('div');
+            spinner.className = 'loading-spinner';
+            wrapper.appendChild(spinner);
+
+            // 图片元素
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = alt;
+
+            // 加载完成
+            img.addEventListener('load', () => {
+                spinner.remove();
+                img.classList.add('loaded');
+            });
+
+            // 加载失败
+            img.addEventListener('error', () => {
+                spinner.remove();
+                const errorTip = document.createElement('div');
+                errorTip.className = 'load-error';
+                errorTip.textContent = '图片加载失败';
+                wrapper.appendChild(errorTip);
+            });
+
+            wrapper.appendChild(img);
+            return wrapper;
+        }
+
+        // 初始化轮播
         function initCarousel() {
             const carouselTrack = document.getElementById('carouselTrack');
             const indicators = document.getElementById('carouselIndicators');
-            
-            // 清空原有内容
             carouselTrack.innerHTML = '';
             indicators.innerHTML = '';
 
-            // 生成轮播图片和指示器
             imageList.forEach((url, index) => {
-                // 生成轮播图片
-                const img = document.createElement('img');
-                img.src = url;
-                img.alt = `轮播图片${index + 1}`;
-                carouselTrack.appendChild(img);
+                const imgWrapper = createImageWithPlaceholder(url, `轮播图片${index + 1}`, true);
+                carouselTrack.appendChild(imgWrapper);
 
-                // 生成指示器小圆点
                 const indicator = document.createElement('div');
                 indicator.className = `indicator ${index === 0 ? 'active' : ''}`;
                 indicator.dataset.index = index;
-                // 点击圆点切换图片
-                indicator.addEventListener('click', () => {
-                    goToSlide(index);
-                });
+                indicator.addEventListener('click', () => goToSlide(index));
                 indicators.appendChild(indicator);
             });
 
-            // 只有1张图时隐藏切换按钮和指示器
             if (imageList.length <= 1) {
                 document.getElementById('prevBtn').style.display = 'none';
                 document.getElementById('nextBtn').style.display = 'none';
@@ -253,33 +332,18 @@
             }
         }
 
-        // 4. 切换到指定轮播图
+        // 切换轮播图
         function goToSlide(index) {
-            // 边界处理：循环切换
-            if (index < 0) {
-                currentSlide = imageList.length - 1;
-            } else if (index >= imageList.length) {
-                currentSlide = 0;
-            } else {
-                currentSlide = index;
-            }
-
-            // 移动轮播轨道
-            const carouselTrack = document.getElementById('carouselTrack');
-            carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
-
-            // 更新指示器状态
-            const indicators = document.querySelectorAll('.indicator');
-            indicators.forEach((ind, i) => {
+            currentSlide = index < 0 ? imageList.length - 1 : index >= imageList.length ? 0 : index;
+            document.getElementById('carouselTrack').style.transform = `translateX(-${currentSlide * 100}%)`;
+            document.querySelectorAll('.indicator').forEach((ind, i) => {
                 ind.classList.toggle('active', i === currentSlide);
             });
         }
 
-        // 5. 初始化页面内容
+        // 初始化页面
         function initPage() {
             const params = getUrlParams();
-            
-            // 填充文本内容
             const originalText = params.original || '默认原文：The woods are lovely, dark and deep.';
             const translatedText = params.translated || '默认翻译：树林可爱，深邃幽暗。';
             document.getElementById('originalText').textContent = originalText;
@@ -287,59 +351,43 @@
 
             // 获取图片列表
             imageList = params.images 
-                ? params.images.split(',').filter(url => url.trim()) // 过滤空URL
-                : ['https://picsum.photos/250/200?random=1'];
+                ? params.images.split(',').filter(url => url.trim())
+                : ['https://picsum.photos/400/300?random=1']; // 4:3比例测试图
 
-            // 生成桌面端flex排布的图片
+            // 生成桌面端图片
             const imageContainer = document.getElementById('imageContainer');
             imageContainer.innerHTML = '';
             imageList.forEach((url, index) => {
-                const img = document.createElement('img');
-                img.src = url;
-                img.alt = `展示图片${index + 1}`;
-                imageContainer.appendChild(img);
+                const imgWrapper = createImageWithPlaceholder(url, `展示图片${index + 1}`);
+                imageContainer.appendChild(imgWrapper);
             });
 
-            // 初始化轮播
             initCarousel();
         }
 
-        // 6. 绑定轮播切换事件
+        // 绑定轮播事件
         function bindCarouselEvents() {
-            // 上一张
-            document.getElementById('prevBtn').addEventListener('click', () => {
-                goToSlide(currentSlide - 1);
-            });
-            // 下一张
-            document.getElementById('nextBtn').addEventListener('click', () => {
-                goToSlide(currentSlide + 1);
-            });
+            document.getElementById('prevBtn').addEventListener('click', () => goToSlide(currentSlide - 1));
+            document.getElementById('nextBtn').addEventListener('click', () => goToSlide(currentSlide + 1));
 
-            // 移动端滑动支持（可选）
+            // 移动端滑动
             const carouselContainer = document.getElementById('carouselContainer');
             let startX = 0;
-            carouselContainer.addEventListener('touchstart', (e) => {
-                startX = e.touches[0].clientX;
-            });
+            carouselContainer.addEventListener('touchstart', (e) => startX = e.touches[0].clientX);
             carouselContainer.addEventListener('touchend', (e) => {
                 const endX = e.changedTouches[0].clientX;
                 const diffX = startX - endX;
-                // 滑动距离大于50px才触发切换
-                if (diffX > 50) {
-                    goToSlide(currentSlide + 1); // 左滑→下一张
-                } else if (diffX < -50) {
-                    goToSlide(currentSlide - 1); // 右滑→上一张
-                }
+                if (diffX > 50) goToSlide(currentSlide + 1);
+                else if (diffX < -50) goToSlide(currentSlide - 1);
             });
         }
 
-        // 页面加载完成后初始化
+        // 页面加载初始化
         window.onload = () => {
             initPage();
             bindCarouselEvents();
         };
 
-        // 窗口大小变化时重新初始化（可选，适配窗口缩放）
         window.addEventListener('resize', () => {
             initCarousel();
             goToSlide(currentSlide);
